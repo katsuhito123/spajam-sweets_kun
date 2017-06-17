@@ -14,5 +14,4 @@
     <string name="input_error_msg">IDとパスワードを入力してください</string>
     <string name="login_error_msg">メールアドレスかパスワードが間違っています</string>
     <string name="title_activity_hoge">HogeActivity</string>
->>>>>>> c9574be17e75b6f08d704137662d57b3fe09eb1a
 </resources>
