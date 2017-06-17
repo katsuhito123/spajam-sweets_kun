@@ -1,6 +1,7 @@
 package me.nontan.spajam_sweets_kun
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -13,15 +14,13 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import me.nontan.spajam_sweets_kun.models.Bounds
 import me.nontan.spajam_sweets_kun.models.Review
 import me.nontan.spajam_sweets_kun.models.ReviewSearchResponse
 import me.nontan.spajam_sweets_kun.utilities.iconNumberToResource
 import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
+import me.nontan.spajam_sweets_kun.utilities.shrinkIcon
 import me.nontan.spajam_sweets_kun.views.PopupView
 import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
 import retrofit2.Call
@@ -29,6 +28,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 import kotlin.concurrent.timer
+
+
 
 class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private val handler: Handler = Handler()
@@ -42,6 +43,8 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var userId: Int = 0
     private var token: String = ""
 
+    private var iconBitmaps: Array<BitmapDescriptor> = arrayOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_maps)
@@ -51,6 +54,15 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         floatingActionButton = findViewById(R.id.map_floating_action_button) as FloatingActionButton
         floatingActionButton?.setOnClickListener {
             onClickFloatingActionButton()
+        }
+
+        val maxSize = 48
+        for (i in 0..5) {
+            val resourceId = iconNumberToResource(i)
+            val rawBitmap = BitmapFactory.decodeResource(resources, resourceId)
+            val resizedBitmap = shrinkIcon(rawBitmap, maxSize)
+            val resizedBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(resizedBitmap)
+            iconBitmaps = iconBitmaps.plusElement(resizedBitmapDescriptor)
         }
 
         val mapFragment = supportFragmentManager
@@ -205,8 +217,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                             val findResult = oldReviews.find { it.review_id == newReview.review_id }
                             if (findResult == null) { // newly appeared
                                 val pos = LatLng(newReview.latitude, newReview.longitude)
-                                val resourceId = iconNumberToResource(newReview.sweet_type)
-                                val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(resourceId))
+                                val markerOpt = MarkerOptions().position(pos).icon(iconBitmaps[newReview.sweet_type])
                                 val marker = googleMap.addMarker(markerOpt)
 
                                 reviewMarker[newReview] = marker
