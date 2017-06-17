@@ -2,6 +2,7 @@ package me.nontan.spajam_sweets_kun
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.*
 import com.google.gson.Gson
 
@@ -13,6 +14,7 @@ class ReviewActivity : AppCompatActivity() {
     var sendBtn:Button? = null
     var id:Int? = null
     var rate:Int? = null
+    var sweets:ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +25,7 @@ class ReviewActivity : AppCompatActivity() {
         swtSpn = findViewById(R.id.spinner) as Spinner
         review = findViewById(R.id.editText) as EditText
         sendBtn = findViewById(R.id.button) as Button
+        sweets = findViewById(R.id.sweets) as ImageView
 
         val intent = this.intent
         id = intent.getIntExtra("shop_id",0)
@@ -30,6 +33,34 @@ class ReviewActivity : AppCompatActivity() {
 
         rateBar!!.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
             rate = rating.toInt()
+        }
+
+        swtSpn!!.onItemSelectedListener=object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
+                when(pos){
+                    0 -> {
+                        sweets!!.setImageResource(R.drawable.cake)
+                    }
+                    1 -> {
+                        sweets!!.setImageResource(R.drawable.crepe)
+                    }
+                    2 -> {
+                        sweets!!.setImageResource(R.drawable.icecream)
+                    }
+                    3 -> {
+                        sweets!!.setImageResource(R.drawable.kakigoori)
+                    }
+                    4 -> {
+                        sweets!!.setImageResource(R.drawable.pafe)
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<out Adapter>?) {
+
+            }
+
         }
 
         sendBtn!!.setOnClickListener {
