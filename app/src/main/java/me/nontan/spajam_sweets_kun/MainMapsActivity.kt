@@ -147,7 +147,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         val sweetsInfoLayout = SweetsInfoLayout(this)
         sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
-        popupView?.setMaxHeight(800)
+        popupView?.setMaxHeight(600)
         popupView?.setContentView(sweetsInfoLayout)
         popupView?.setDismissOnTouchOutside(true)
         popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
