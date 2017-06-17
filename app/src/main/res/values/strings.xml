@@ -1,5 +1,13 @@
 <resources>
     <string name="title_activity_main_maps">Map</string>
+    <string name="spn_pronpt">スイーツを選択をしてください</string>
+    <string-array name="spn_items">
+        <item>ケーキ</item>
+        <item>クレープ</item>
+        <item>アイスクリーム</item>
+        <item>かき氷</item>
+        <item>パフェ</item>
+    </string-array>
     <string name="app_name">スイーツくん</string>
     <string name="login">ログイン</string>
     <string name="user_id">ユーザID</string>
