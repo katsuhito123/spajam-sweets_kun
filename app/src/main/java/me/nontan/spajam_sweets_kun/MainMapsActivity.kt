@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.view.View
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -17,18 +18,23 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import me.nontan.spajam_sweets_kun.models.Bounds
-import me.nontan.spajam_sweets_kun.models.SweetsKun
+import me.nontan.spajam_sweets_kun.models.Review
+import me.nontan.spajam_sweets_kun.models.ReviewSearchResponse
+import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import me.nontan.spajam_sweets_kun.views.PopupView
 import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 import kotlin.concurrent.timer
 
 class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private val handler: Handler = Handler()
     private var mMap: GoogleMap? = null
-    private var sweetsKuns: Array<SweetsKun> = arrayOf()
-    private var sweetsKunMarker: HashMap<SweetsKun, Marker> = hashMapOf()
-    private var sweetsKunPosition: HashMap<SweetsKun, LatLng> = hashMapOf()
+    private var reviews: Array<Review> = arrayOf()
+    private var reviewMarker: HashMap<Review, Marker> = hashMapOf()
+    private var reviewPosition: HashMap<Review, LatLng> = hashMapOf()
     private var popupView: PopupView? = null
     private var floatingActionButton: FloatingActionButton? = null
 
@@ -88,20 +94,18 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         googleMap.isBuildingsEnabled = false
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
 
-
-        sweetsKuns = arrayOf(SweetsKun(0, 0, 35.0, 135.0))
         onSweetsViewsUpdated()
     }
 
     fun onSweetsViewsUpdated() {
         val googleMap = mMap?.let { it } ?: return
-        for (sweetsKun in sweetsKuns) {
+        for (sweetsKun in reviews) {
             val pos = LatLng(sweetsKun.latitude, sweetsKun.longitude)
             val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
             val marker = googleMap.addMarker(markerOpt)
 
-            sweetsKunMarker[sweetsKun] = marker
-            sweetsKunPosition[sweetsKun] = pos
+            reviewMarker[sweetsKun] = marker
+            reviewPosition[sweetsKun] = pos
         }
 
         timer("randomWalkTimer", false, 0, 500, {
@@ -120,9 +124,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     fun randomWalkSweetsKun() {
         handler.post {
-            for (sweetsKun in sweetsKuns) {
-                val marker = sweetsKunMarker[sweetsKun].let { it } ?: continue
-                val currentPos = sweetsKunPosition[sweetsKun].let { it } ?: continue
+            for (sweetsKun in reviews) {
+                val marker = reviewMarker[sweetsKun].let { it } ?: continue
+                val currentPos = reviewPosition[sweetsKun].let { it } ?: continue
                 val newLatitude = currentPos.latitude + kokunoaruRandom()
                 val newLongitude = currentPos.longitude + kokunoaruRandom()
                 val newPos = LatLng(newLatitude, newLongitude)
@@ -180,6 +184,51 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     fun onCameraIdle() {
         val bounds = getBounds()
 
+        val lat_min = bounds.lat_min
+        val lat_max = bounds.lat_max
+        val long_min = bounds.long_min
+        val long_max = bounds.long_max
 
+        val reviewSearchCall = sharedAPIInstance.reviewSearch(lat_min, lat_max, long_min, long_max)
+        reviewSearchCall.enqueue(object: Callback<ReviewSearchResponse> {
+            override fun onResponse(call: Call<ReviewSearchResponse>, response: Response<ReviewSearchResponse>) {
+                Log.d("reviewsearch", "Response: " + response.body().toString());
+                Log.d("reviewsearch", "Error: " + response.errorBody()?.string().toString())
+
+
+                response.body()?.review?.let { newReviews ->
+                    Log.d("reviewsearch", "num newReviews: " + newReviews.size)
+                    handler.post {
+                        val googleMap = mMap?.let { it } ?: return@post
+                        val oldReviews = reviews.clone()
+                        for (newReview in newReviews) {
+                            val findResult = oldReviews.find { it.review_id == newReview.review_id }
+                            if (findResult == null) { // newly appeared
+                                val pos = LatLng(newReview.latitude, newReview.longitude)
+                                val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
+                                val marker = googleMap.addMarker(markerOpt)
+
+                                reviewMarker[newReview] = marker
+                                reviewPosition[newReview] = pos
+                            }
+                        }
+
+                        for (oldReview in oldReviews) {
+                            val findResult = newReviews.find { it.review_id == oldReview.review_id }
+                            if (findResult == null) { // disappeared
+                                reviewMarker[oldReview]?.remove()
+                                reviewMarker.remove(oldReview)
+                                reviewPosition.remove(oldReview)
+                            }
+                        }
+                        reviews = newReviews.clone()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ReviewSearchResponse>?, t: Throwable?) {
+                Log.d("reviewsearch", t.toString())
+            }
+        })
     }
 }
