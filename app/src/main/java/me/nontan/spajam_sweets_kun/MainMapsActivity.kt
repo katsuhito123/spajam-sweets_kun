@@ -1,5 +1,6 @@
 package me.nontan.spajam_sweets_kun
 
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
@@ -99,6 +100,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     fun onMarkerClick(marker: Marker): Boolean {
         val sweetsInfoLayout = SweetsInfoLayout(this)
+        sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
         popupView?.setMaxHeight(800)
         popupView?.setContentView(sweetsInfoLayout)

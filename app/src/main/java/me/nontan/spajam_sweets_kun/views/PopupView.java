@@ -172,7 +172,6 @@ public final class PopupView extends RelativeLayout {
                 if (anchorGravity == AnchorGravity.CENTER) {
                     return;
                 }
-                System.out.printf("%d, %d\n", mContentView.getWidth(), mContentView.getHeight());
                 mContentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
