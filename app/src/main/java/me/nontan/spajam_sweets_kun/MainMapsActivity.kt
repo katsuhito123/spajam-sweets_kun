@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import me.nontan.spajam_sweets_kun.models.Bounds
 import me.nontan.spajam_sweets_kun.models.Review
 import me.nontan.spajam_sweets_kun.models.ReviewSearchResponse
+import me.nontan.spajam_sweets_kun.utilities.iconNumberToResource
 import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import me.nontan.spajam_sweets_kun.views.PopupView
 import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
@@ -195,7 +196,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                 Log.d("reviewsearch", "Response: " + response.body().toString());
                 Log.d("reviewsearch", "Error: " + response.errorBody()?.string().toString())
 
-
                 response.body()?.review?.let { newReviews ->
                     Log.d("reviewsearch", "num newReviews: " + newReviews.size)
                     handler.post {
@@ -205,7 +205,8 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                             val findResult = oldReviews.find { it.review_id == newReview.review_id }
                             if (findResult == null) { // newly appeared
                                 val pos = LatLng(newReview.latitude, newReview.longitude)
-                                val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
+                                val resourceId = iconNumberToResource(newReview.sweet_type)
+                                val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(resourceId))
                                 val marker = googleMap.addMarker(markerOpt)
 
                                 reviewMarker[newReview] = marker
