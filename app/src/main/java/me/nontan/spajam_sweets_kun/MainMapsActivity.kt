@@ -28,6 +28,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var sweetsKunPosition: HashMap<SweetsKun, LatLng> = hashMapOf()
     private var popupView: PopupView? = null
 
+    private var userId: Int = 0
+    private var token: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_maps)
@@ -38,6 +41,16 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val userId = intent.getIntExtra("user_id", 0)
+        val token = intent.getStringExtra("token") ?: throw Exception("No token")
+
+        this.userId = userId
+        this.token = token
     }
 
     /**
