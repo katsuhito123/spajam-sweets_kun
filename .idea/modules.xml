@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/spajam-sweets_kun.iml" filepath="$PROJECT_DIR$/spajam-sweets_kun.iml" />
+      <module fileurl="file:///Library/WebServer/Documents/spajam-sweets_kun/app/app.iml" filepath="/Library/WebServer/Documents/spajam-sweets_kun/app/app.iml" />
+      <module fileurl="file:///Library/WebServer/Documents/spajam-sweets_kun/spajam-sweets_kun.iml" filepath="/Library/WebServer/Documents/spajam-sweets_kun/spajam-sweets_kun.iml" />
     </modules>
   </component>
 </project>
