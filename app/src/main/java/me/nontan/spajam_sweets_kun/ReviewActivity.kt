@@ -7,6 +7,8 @@ import android.view.View
 import android.widget.*
 import me.nontan.spajam_sweets_kun.models.ReviewCreateRequest
 import me.nontan.spajam_sweets_kun.models.ReviewCreateResponse
+import me.nontan.spajam_sweets_kun.utilities.accessToken
+import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

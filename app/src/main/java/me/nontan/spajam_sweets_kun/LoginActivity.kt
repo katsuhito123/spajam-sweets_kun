@@ -11,6 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import me.nontan.spajam_sweets_kun.models.AuthenticationResponse
 import me.nontan.spajam_sweets_kun.models.LoginRequest
+import me.nontan.spajam_sweets_kun.utilities.accessToken
+import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
