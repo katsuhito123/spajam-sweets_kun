@@ -137,8 +137,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     fun randomWalkSweetsKun() {
         handler.post {
             if (popupView.isShowing) {
-
+                return@post
             }
+
             for (sweetsKun in reviews) {
                 val marker = reviewMarker[sweetsKun].let { it } ?: continue
                 val currentPos = reviewPosition[sweetsKun].let { it } ?: continue
