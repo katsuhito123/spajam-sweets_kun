@@ -41,10 +41,10 @@ class ReviewActivity : AppCompatActivity() {
 //        intent.putExtra("shop_id",shop_id)
 //            Toast.makeText(this,"id = "+shop_id+",rateNum = "+rateNum+ ",review_text = "+review_text+",sweet_type = "+sweet_type,Toast.LENGTH_SHORT).show()
 
-            var gson: Gson = Gson()
-            val review:Review = Review(shop_id,rateNum,review_text,sweet_type)
+            //var gson: Gson = Gson()
+            //val review:Review = Review(shop_id,rateNum,review_text,sweet_type)
 //            gson.toJson(review)
-            Toast.makeText(this,gson.toJson(review).toString(),Toast.LENGTH_LONG).show()
+            //Toast.makeText(this,gson.toJson(review).toString(),Toast.LENGTH_LONG).show()
         }
     }
 }

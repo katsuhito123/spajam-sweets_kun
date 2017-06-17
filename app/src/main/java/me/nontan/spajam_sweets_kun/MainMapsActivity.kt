@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import me.nontan.spajam_sweets_kun.models.Bounds
 import me.nontan.spajam_sweets_kun.models.SweetsKun
 import me.nontan.spajam_sweets_kun.views.PopupView
 import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
@@ -74,6 +75,10 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
         googleMap.setOnMarkerClickListener { marker ->
             this.onMarkerClick(marker)
+        }
+
+        googleMap.setOnCameraIdleListener {
+            this.onCameraIdle()
         }
 
         // Add a marker in Sydney and move the camera
@@ -146,7 +151,34 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun onClickFloatingActionButton() {
+        val bounds = getBounds()
+
         val intent = Intent(this, ShopsListActivity::class.java)
+        intent.putExtra("lat_min", bounds.lat_min)
+        intent.putExtra("lat_max", bounds.lat_max)
+        intent.putExtra("long_min", bounds.long_min)
+        intent.putExtra("long_max", bounds.long_max)
+
         startActivity(intent)
+    }
+
+    fun getBounds(): Bounds {
+        val googleMap = mMap?.let { it } ?: return Bounds(0.0, 0.0, 0.0, 0.0)
+        val bounds = googleMap.projection.visibleRegion.latLngBounds
+        val northeast = bounds.northeast
+        val southwest = bounds.southwest
+
+        val lat_max = northeast.latitude
+        val lat_min = southwest.latitude
+
+        val long_max = northeast.longitude
+        val long_min = southwest.longitude
+
+        return Bounds(lat_max, lat_min, long_max, long_min)
+    }
+
+    fun onCameraIdle() {
+        val bounds = getBounds()
+
     }
 }

@@ -1,4 +1,4 @@
-package me.nontan.spajam_sweets_kun
+package me.nontan.spajam_sweets_kun.models
 
 /**
  * Created by koichihasegawa on 2017/06/17.
@@ -9,5 +9,5 @@ data class Shop(
         val address:String,
         val latitude:Double,
         val longitude:Double,
-        val review:String
+        val review:String?
 )
