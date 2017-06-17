@@ -3,4 +3,6 @@
     <string name="login">ログイン</string>
     <string name="user_id">ユーザID</string>
     <string name="password">パスワード</string>
+    <string name="input_error_msg">IDとパスワードを入力してください</string>
+    <string name="login_error_msg">メールアドレスかパスワードが間違っています</string>
 </resources>
