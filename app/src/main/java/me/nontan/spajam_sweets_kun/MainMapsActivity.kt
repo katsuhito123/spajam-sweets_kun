@@ -1,9 +1,11 @@
 package me.nontan.spajam_sweets_kun
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.FragmentActivity
 import android.view.View
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,6 +29,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var sweetsKunMarker: HashMap<SweetsKun, Marker> = hashMapOf()
     private var sweetsKunPosition: HashMap<SweetsKun, LatLng> = hashMapOf()
     private var popupView: PopupView? = null
+    private var floatingActionButton: FloatingActionButton? = null
 
     private var userId: Int = 0
     private var token: String = ""
@@ -37,6 +40,10 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
         popupView = findViewById(R.id.popup_view) as PopupView
+        floatingActionButton = findViewById(R.id.map_floating_action_button) as FloatingActionButton
+        floatingActionButton?.setOnClickListener {
+            onClickFloatingActionButton()
+        }
 
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -127,5 +134,10 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         popupView?.setDismissOnTouchOutside(true)
         popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
         return true
+    }
+
+    fun onClickFloatingActionButton() {
+        val intent = Intent(this, ShopsListActivity::class.java)
+        startActivity(intent)
     }
 }
