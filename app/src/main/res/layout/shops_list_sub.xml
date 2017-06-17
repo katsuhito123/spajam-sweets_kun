@@ -41,8 +41,9 @@
                         android:layout_height="48dp"
                         android:gravity="center_vertical"
                         android:paddingLeft="20dp"
-                        android:text="Name"
-                        android:textSize="22sp"
+                        android:text="name"
+                        android:textAlignment="viewStart"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView

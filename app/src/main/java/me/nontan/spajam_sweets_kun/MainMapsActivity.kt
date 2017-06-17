@@ -86,7 +86,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         googleMap.setOnCameraIdleListener {
             this.onCameraIdle()
         }
-
+      
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         googleMap.isIndoorEnabled = false
@@ -147,7 +147,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         val sweetsInfoLayout = SweetsInfoLayout(this)
         sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
-        popupView?.setMaxHeight(600)
+        popupView?.setMaxHeight(400)
         popupView?.setContentView(sweetsInfoLayout)
         popupView?.setDismissOnTouchOutside(true)
         popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
