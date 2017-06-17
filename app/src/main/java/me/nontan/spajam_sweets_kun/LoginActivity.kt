@@ -11,33 +11,35 @@ import android.widget.Toast
 class LoginActivity : AppCompatActivity() {
     var userIdForm: EditText? = null
     var passwordForm: EditText? = null
+    var loginService: LoginService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         val retrofit= Retrofit.Builder()
-                .baseUrl("https://api.github.com/")
+                .baseUrl("https://private.turenar.xyz/sweetskun/")
                 .build()
 
-        val service = retrofit.create(GitHubService::class.java)
+        loginService = retrofit.create(LoginService::class.java)
     }
 
     fun onClickLoginButton(view: View) {
         userIdForm = findViewById(R.id.user_id) as EditText
         passwordForm = findViewById(R.id.password) as EditText
+        var userId: String? = null
+        var password: String? = null
 
         try {
-            val userId: String = userIdForm!!.text.toString()
-            val password: String = passwordForm!!.text.toString()
+            userId = userIdForm!!.text.toString()
+            password = passwordForm!!.text.toString()
         } catch (e: NumberFormatException) {
             Toast.makeText(this, R.string.input_error_msg, Toast.LENGTH_SHORT).show()
         }
 
         try {
-            Call<Token> = service.login(userId, password)
-            val token: String? = null
-            var intent : Intent = Intent(this, HogeActivity::class.java)
-            intent.putExtra("token", token)
+            val token: Call<Token> = loginService.login(userId, password)
+            val intent : Intent = Intent(this, HogeActivity::class.java)
+            intent.putExtra("token", token.token)
             startActivity(intent)
         } catch (e: NumberFormatException) {
             Toast.makeText(this, R.string.login_error_msg, Toast.LENGTH_SHORT).show()

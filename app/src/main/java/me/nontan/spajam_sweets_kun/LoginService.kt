@@ -1,9 +1,12 @@
 package me.nontan.spajam_sweets_kun
 
-import android.telecom.Call
 import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User
+import me.nontan.spajam_sweets_kun.models.Token
+import retrofit.http.Field
+import retrofit.http.FormUrlEncoded
+import retrofit.http.GET
 
-interface RetroFitApi {
+interface LoginService {
     @FormUrlEncoded
     @GET("login")
     fun login(
