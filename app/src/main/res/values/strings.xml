@@ -4,6 +4,8 @@
     <string-array name="spn_items">
         <item>ケーキ</item>
         <item>クレープ</item>
-        <item>ice cream</item>
+        <item>アイスクリーム</item>
+        <item>かき氷</item>
+        <item>パフェ</item>
     </string-array>
 </resources>
