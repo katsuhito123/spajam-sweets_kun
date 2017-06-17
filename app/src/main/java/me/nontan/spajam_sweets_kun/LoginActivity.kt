@@ -24,6 +24,8 @@ class LoginActivity : AppCompatActivity() {
             .build()
             .create(LoginService::class.java)
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -57,5 +59,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
 }
 
