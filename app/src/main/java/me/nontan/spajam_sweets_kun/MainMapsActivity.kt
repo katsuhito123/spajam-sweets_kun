@@ -1,8 +1,10 @@
 package me.nontan.spajam_sweets_kun
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.FragmentActivity
+import android.view.View
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -12,6 +14,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import me.nontan.spajam_sweets_kun.models.SweetsKun
+import me.nontan.spajam_sweets_kun.views.PopupView
+import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
 import java.util.*
 import kotlin.concurrent.timer
 
@@ -21,11 +25,15 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private var sweetsKuns: Array<SweetsKun> = arrayOf()
     private var sweetsKunMarker: HashMap<SweetsKun, Marker> = hashMapOf()
     private var sweetsKunPosition: HashMap<SweetsKun, LatLng> = hashMapOf()
+    private var popupView: PopupView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
+        popupView = findViewById(R.id.popup_view) as PopupView
+
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -43,12 +51,17 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        googleMap.setOnMarkerClickListener { marker ->
+            this.onMarkerClick(marker)
+        }
+
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         googleMap.isIndoorEnabled = false
         googleMap.isTrafficEnabled = false
         googleMap.isBuildingsEnabled = false
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
 
         sweetsKuns = arrayOf(SweetsKun(0, 0, 35.0, 135.0))
         onSweetsViewsUpdated()
@@ -82,5 +95,15 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                 marker.position = newPos
             }
         }
+    }
+
+    fun onMarkerClick(marker: Marker): Boolean {
+        val sweetsInfoLayout = SweetsInfoLayout(this)
+        sweetsInfoLayout.visibility = View.VISIBLE
+        popupView?.setMaxHeight(800)
+        popupView?.setContentView(sweetsInfoLayout)
+        popupView?.setDismissOnTouchOutside(true)
+        popupView?.show(Rect(100, 100, 100, 100), PopupView.AnchorGravity.AUTO, 300, 0)
+        return true
     }
 }
