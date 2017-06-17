@@ -40,13 +40,15 @@ class LoginActivity : AppCompatActivity() {
 
             try {
                 val token_call: Call<Authentication> = loginService.login(LoginRequest(userId, password))
-                val intent : Intent = Intent(this, HogeActivity::class.java)
+                val intent : Intent = Intent(this, MainMapsActivity::class.java)
                 token_call.enqueue(object: Callback<Authentication> {
                     override fun onResponse(call: Call<Authentication>, response: Response<Authentication>) {
                         Log.d("authentication", "Response: " + response.body().toString());
                         Log.d("authentication", "Error: " + response.errorBody()?.string().toString())
-                        response.body()?.authentication?.token?.let { token ->
-                            intent.putExtra("token", token)
+
+                        response.body()?.authentication?.let { authentication ->
+                            intent.putExtra("user_id", authentication.user_id)
+                            intent.putExtra("token", authentication.token)
                             startActivity(intent)
                         }
                     }
