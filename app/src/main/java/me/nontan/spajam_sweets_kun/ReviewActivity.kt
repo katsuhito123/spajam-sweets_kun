@@ -61,24 +61,24 @@ class ReviewActivity : AppCompatActivity() {
             })
         }
 
-        swtSpn!!.onItemSelectedListener=object : AdapterView.OnItemSelectedListener {
+        swtSpn.onItemSelectedListener=object : AdapterView.OnItemSelectedListener {
 
             override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
                 when(pos){
                     0 -> {
-                        sweets!!.setImageResource(R.drawable.cake)
+                        sweets.setImageResource(R.drawable.cake)
                     }
                     1 -> {
-                        sweets!!.setImageResource(R.drawable.crepe)
+                        sweets.setImageResource(R.drawable.crepe)
                     }
                     2 -> {
-                        sweets!!.setImageResource(R.drawable.icecream)
+                        sweets.setImageResource(R.drawable.icecream)
                     }
                     3 -> {
-                        sweets!!.setImageResource(R.drawable.kakigoori)
+                        sweets.setImageResource(R.drawable.kakigoori)
                     }
                     4 -> {
-                        sweets!!.setImageResource(R.drawable.pafe)
+                        sweets.setImageResource(R.drawable.pafe)
                     }
                 }
             }
