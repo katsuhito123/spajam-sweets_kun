@@ -180,5 +180,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     fun onCameraIdle() {
         val bounds = getBounds()
 
+
     }
 }

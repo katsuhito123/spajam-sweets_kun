@@ -1,8 +1,6 @@
 package me.nontan.spajam_sweets_kun
 
-import me.nontan.spajam_sweets_kun.models.AuthenticationResponse
-import me.nontan.spajam_sweets_kun.models.LoginRequest
-import me.nontan.spajam_sweets_kun.models.ShopSearchResponse
+import me.nontan.spajam_sweets_kun.models.*
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -19,5 +17,15 @@ interface LoginService {
             @Query("lat_max") lat_max: Double,
             @Query("long_min") long_min: Double,
             @Query("long_max") long_max: Double): Call<ShopSearchResponse>
+
+    @GET("review/search")
+    fun reviewSearch(
+            @Query("lat_min") lat_min: Double,
+            @Query("lat_max") lat_max: Double,
+            @Query("long_min") long_min: Double,
+            @Query("long_max") long_max: Double): Call<ReviewSearchResponse>
+
+    @POST("review/create")
+    fun reviewCreate(@Body body: ReviewCreateRequest): Call<ReviewCreateResponse>
 }
 
