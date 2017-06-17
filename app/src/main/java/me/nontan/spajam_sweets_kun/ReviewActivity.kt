@@ -8,6 +8,7 @@ import android.widget.*
 import me.nontan.spajam_sweets_kun.models.ReviewCreateRequest
 import me.nontan.spajam_sweets_kun.models.ReviewCreateResponse
 import me.nontan.spajam_sweets_kun.utilities.accessToken
+import me.nontan.spajam_sweets_kun.utilities.iconNumberToResource
 import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import retrofit2.Call
 import retrofit2.Callback
@@ -66,23 +67,8 @@ class ReviewActivity : AppCompatActivity() {
         swtSpn.onItemSelectedListener=object : AdapterView.OnItemSelectedListener {
 
             override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
-                when(pos){
-                    0 -> {
-                        sweets.setImageResource(R.drawable.cake)
-                    }
-                    1 -> {
-                        sweets.setImageResource(R.drawable.crepe)
-                    }
-                    2 -> {
-                        sweets.setImageResource(R.drawable.icecream)
-                    }
-                    3 -> {
-                        sweets.setImageResource(R.drawable.kakigoori)
-                    }
-                    4 -> {
-                        sweets.setImageResource(R.drawable.pafe)
-                    }
-                }
+                val resourceId = iconNumberToResource(pos)
+                sweets.setImageResource(resourceId)
             }
 
             override fun onNothingSelected(parent: AdapterView<out Adapter>?) {
