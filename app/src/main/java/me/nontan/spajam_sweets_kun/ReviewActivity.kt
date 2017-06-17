@@ -3,6 +3,7 @@ package me.nontan.spajam_sweets_kun
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.*
 import me.nontan.spajam_sweets_kun.models.ReviewCreateRequest
 import me.nontan.spajam_sweets_kun.models.ReviewCreateResponse
@@ -16,6 +17,7 @@ class ReviewActivity : AppCompatActivity() {
     lateinit var swtSpn: Spinner
     lateinit var review: EditText
     lateinit var sendBtn: Button
+    lateinit var sweets: ImageView
 
     var id: Int = 0
     var rate: Int = 3
@@ -29,6 +31,7 @@ class ReviewActivity : AppCompatActivity() {
         swtSpn = findViewById(R.id.spinner) as Spinner
         review = findViewById(R.id.editText) as EditText
         sendBtn = findViewById(R.id.button) as Button
+        sweets = findViewById(R.id.sweets) as ImageView
 
         val intent = this.intent
         id = intent.getIntExtra("shop_id", 0)
@@ -46,15 +49,44 @@ class ReviewActivity : AppCompatActivity() {
 
             val request = ReviewCreateRequest(shop_id, rateNum, review_text, sweet_type)
             val call = sharedAPIInstance.reviewCreate("Bearer " + accessToken, request)
-            call.enqueue(object: Callback<ReviewCreateResponse> {
+            call.enqueue(object : Callback<ReviewCreateResponse> {
                 override fun onResponse(call: Call<ReviewCreateResponse>, response: Response<ReviewCreateResponse>) {
                     Log.d("reviewcreate", "Response: " + response.body().toString());
                     Log.d("reviewcreate", "Error: " + response.errorBody()?.string().toString())
                 }
+
                 override fun onFailure(call: Call<ReviewCreateResponse>?, t: Throwable?) {
                     Log.d("reviewcreate", t.toString())
                 }
             })
+        }
+
+        swtSpn!!.onItemSelectedListener=object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
+                when(pos){
+                    0 -> {
+                        sweets!!.setImageResource(R.drawable.cake)
+                    }
+                    1 -> {
+                        sweets!!.setImageResource(R.drawable.crepe)
+                    }
+                    2 -> {
+                        sweets!!.setImageResource(R.drawable.icecream)
+                    }
+                    3 -> {
+                        sweets!!.setImageResource(R.drawable.kakigoori)
+                    }
+                    4 -> {
+                        sweets!!.setImageResource(R.drawable.pafe)
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<out Adapter>?) {
+
+            }
+
         }
     }
 }
