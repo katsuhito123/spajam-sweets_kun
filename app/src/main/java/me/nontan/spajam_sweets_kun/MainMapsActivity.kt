@@ -33,12 +33,12 @@ import kotlin.concurrent.timer
 
 class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private val handler: Handler = Handler()
-    private var mMap: GoogleMap? = null
+    private lateinit var googleMap: GoogleMap
     private var reviews: Array<Review> = arrayOf()
     private var reviewMarker: HashMap<Review, Marker> = hashMapOf()
     private var reviewPosition: HashMap<Review, LatLng> = hashMapOf()
-    private var popupView: PopupView? = null
-    private var floatingActionButton: FloatingActionButton? = null
+    private lateinit var popupView: PopupView
+    private lateinit var floatingActionButton: FloatingActionButton
 
     private var userId: Int = 0
     private var token: String = ""
@@ -52,7 +52,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
         popupView = findViewById(R.id.popup_view) as PopupView
         floatingActionButton = findViewById(R.id.map_floating_action_button) as FloatingActionButton
-        floatingActionButton?.setOnClickListener {
+        floatingActionButton.setOnClickListener {
             onClickFloatingActionButton()
         }
 
@@ -90,7 +90,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        this.googleMap = googleMap
 
         googleMap.setOnMarkerClickListener { marker ->
             this.onMarkerClick(marker)
@@ -111,7 +111,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun onSweetsViewsUpdated() {
-        val googleMap = mMap?.let { it } ?: return
         for (sweetsKun in reviews) {
             val pos = LatLng(sweetsKun.latitude, sweetsKun.longitude)
             val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
@@ -137,6 +136,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     fun randomWalkSweetsKun() {
         handler.post {
+            if (popupView.isShowing) {
+
+            }
             for (sweetsKun in reviews) {
                 val marker = reviewMarker[sweetsKun].let { it } ?: continue
                 val currentPos = reviewPosition[sweetsKun].let { it } ?: continue
@@ -150,8 +152,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun onMarkerClick(marker: Marker): Boolean {
-        val googleMap = mMap?.let { it } ?: return false
-
         val position = marker.position
         val screenLocation = googleMap.projection.toScreenLocation(position)
         val x = screenLocation.x
@@ -160,9 +160,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         val sweetsInfoLayout = SweetsInfoLayout(this)
         sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
-        popupView?.setMaxHeight(600)
-        popupView?.setContentView(sweetsInfoLayout)
-        popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
+        popupView.setMaxHeight(600)
+        popupView.setContentView(sweetsInfoLayout)
+        popupView.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
         return true
     }
 
@@ -179,7 +179,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun getBounds(): Bounds {
-        val googleMap = mMap?.let { it } ?: return Bounds(0.0, 0.0, 0.0, 0.0)
         val bounds = googleMap.projection.visibleRegion.latLngBounds
         val northeast = bounds.northeast
         val southwest = bounds.southwest
@@ -210,7 +209,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                 response.body()?.review?.let { newReviews ->
                     Log.d("reviewsearch", "num newReviews: " + newReviews.size)
                     handler.post {
-                        val googleMap = mMap?.let { it } ?: return@post
                         val oldReviews = reviews.clone()
                         for (newReview in newReviews) {
                             val findResult = oldReviews.find { it.review_id == newReview.review_id }
