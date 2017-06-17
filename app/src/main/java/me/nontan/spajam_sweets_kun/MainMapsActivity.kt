@@ -2,16 +2,19 @@ package me.nontan.spajam_sweets_kun
 
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.view.View
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
+    private var sweetsViews: Array<View> = arrayOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +24,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
-
 
     /**
      * Manipulates the map once available.
@@ -40,7 +42,11 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         mMap!!.isIndoorEnabled = false
         mMap!!.isTrafficEnabled = false
         mMap!!.isBuildingsEnabled = false
-        mMap!!.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+        val marker = MarkerOptions().position(sydney).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
+        mMap!!.addMarker(marker)
         mMap!!.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    }
+
+    fun onSweetsViewsUpdated() {
     }
 }
