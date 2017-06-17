@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import me.nontan.spajam_sweets_kun.models.ShopSearchResponse
+import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

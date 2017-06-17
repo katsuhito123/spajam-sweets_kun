@@ -1,4 +1,4 @@
-package me.nontan.spajam_sweets_kun
+package me.nontan.spajam_sweets_kun.utilities
 
 import me.nontan.spajam_sweets_kun.models.*
 import retrofit2.Call
