@@ -43,6 +43,5 @@
         android:layout_marginTop="40dp"
         android:layout_weight="0"
         android:background="@android:color/darker_gray"
-        android:onClick="onClickLoginButton"
         android:text="@string/login" />
 </LinearLayout>

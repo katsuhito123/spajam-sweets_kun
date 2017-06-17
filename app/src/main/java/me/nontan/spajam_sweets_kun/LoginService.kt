@@ -1,17 +1,17 @@
 package me.nontan.spajam_sweets_kun
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User
-import me.nontan.spajam_sweets_kun.models.Token
-import retrofit.http.Field
-import retrofit.http.FormUrlEncoded
-import retrofit.http.GET
+import me.nontan.spajam_sweets_kun.models.Authentication
+import retrofit2.Call
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
 
 interface LoginService {
     @FormUrlEncoded
-    @GET("login")
+    @POST("login")
     fun login(
             @Field("user_id") user_id: String,
             @Field("password") password: String
-    ): Call<Token>
+    ): Call<Authentication>
 }
 
