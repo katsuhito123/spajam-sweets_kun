@@ -125,6 +125,7 @@
                 android:layout_marginEnd="30dp"
                 android:layout_marginRight="30dp"
                 android:layout_marginTop="8dp"
+                android:background="@color/colorPrimary"
                 android:text="投稿"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
