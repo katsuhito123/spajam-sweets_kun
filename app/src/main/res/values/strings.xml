@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">spajam-sweets_kun</string>
+    <string name="spn_pronpt">スイーツを選択をしてください</string>
+    <string-array name="spn_items">
+        <item>ケーキ</item>
+        <item>クレープ</item>
+        <item>ice cream</item>
+    </string-array>
 </resources>

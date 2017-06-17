@@ -1,12 +1,15 @@
 package me.nontan.spajam_sweets_kun
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.Toast
 
 class ShopsListActivity : AppCompatActivity() {
     var lv: ListView? = null
+    var shop_id:String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +30,14 @@ class ShopsListActivity : AppCompatActivity() {
 
         var adapter = SimpleAdapter(this,listData,R.layout.shops_list_sub,
                 temp_array, intArrayOf(R.id.shopName,R.id.shopAddress))
-        lv!!.setAdapter(adapter)
+        lv!!.adapter = adapter
 
+        lv!!.setOnItemClickListener { parent, view, position, id ->
+            var intent = Intent(this,ReviewActivity::class.java)
+            intent.putExtra("shop_id",0)
+            Toast.makeText(this,"shop_id = "+shop_id,Toast.LENGTH_SHORT).show()
+            startActivity(intent)
+        }
     }
 }
 
