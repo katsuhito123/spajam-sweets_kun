@@ -51,6 +51,8 @@ class LoginActivity : AppCompatActivity() {
                             intent.putExtra("user_id", authentication.user_id)
                             intent.putExtra("token", authentication.token)
 
+                            accessToken = authentication.token
+
                             val preferences = getPreferences(Context.MODE_PRIVATE)
                             val editor = preferences.edit()
                             editor.putString("EMAIL", userId)

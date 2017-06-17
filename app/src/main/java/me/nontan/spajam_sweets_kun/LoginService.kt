@@ -2,10 +2,7 @@ package me.nontan.spajam_sweets_kun
 
 import me.nontan.spajam_sweets_kun.models.*
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface LoginService {
     @POST("login")
@@ -26,6 +23,6 @@ interface LoginService {
             @Query("long_max") long_max: Double): Call<ReviewSearchResponse>
 
     @POST("review/create")
-    fun reviewCreate(@Body body: ReviewCreateRequest): Call<ReviewCreateResponse>
+    fun reviewCreate(@Header("Authorization") auth: String, @Body body: ReviewCreateRequest): Call<ReviewCreateResponse>
 }
 
