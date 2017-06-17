@@ -33,26 +33,28 @@ class ShopsListActivity : AppCompatActivity() {
                     "review": "review0"
                     }"""
         val gson = Gson()
-        val x:Array<Shop> = gson.fromJson(s, Array<Shop>::class.java)
 
         val listData = ArrayList<Map<String, String>>()
         val temp_array:Array<String> = arrayOf("shopName","address")
 
-//        val arrayName:Array<String> = arrayOf("家家家","やーやーやー","huousehouse")
-//        val arrayAddress:Array<String> = arrayOf("本郷","駒場","柏")
-//        for (i in 0..2){
-//            val item = HashMap<String,String>()
-//            item.put("shopName",arrayName[i])
-//            item.put("address",arrayAddress[i])
-//            listData.add(item)
-//        }
-
-        for(i in x.indices){
+        //仮データ入力
+        val arrayName:Array<String> = arrayOf("家家家","やーやーやー","huousehouse")
+        val arrayAddress:Array<String> = arrayOf("本郷","駒場","柏")
+        for (i in 0..2){
             val item = HashMap<String,String>()
-            item.put("shopName",x[i].name)
-            item.put("address",x[i].address)
+            item.put("shopName",arrayName[i])
+            item.put("address",arrayAddress[i])
             listData.add(item)
         }
+
+        //正規
+//        val x:Array<Shop> = gson.fromJson(s, Array<Shop>::class.java)
+//        for(i in x.indices){
+//            val item = HashMap<String,String>()
+//            item.put("shopName",x[i].name)
+//            item.put("address",x[i].address)
+//            listData.add(item)
+//        }
 
         lv = findViewById(R.id.lv) as ListView?
         var adapter = SimpleAdapter(this,listData,R.layout.shops_list_sub,
@@ -61,7 +63,10 @@ class ShopsListActivity : AppCompatActivity() {
 
         lv!!.setOnItemClickListener { parent, view, position, id ->
             var intent = Intent(this,ReviewActivity::class.java)
-            intent.putExtra("shop_id",x[position].shop_id)
+            //正規
+//            intent.putExtra("shop_id",x[position].shop_id)
+            //仮データ入力
+            intent.putExtra("shop_id",shop_id)
             Toast.makeText(this,"shop_id = "+shop_id,Toast.LENGTH_SHORT).show()
             startActivity(intent)
         }
