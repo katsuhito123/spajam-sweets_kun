@@ -162,7 +162,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         sweetsInfoLayout.visibility = View.VISIBLE
         popupView?.setMaxHeight(600)
         popupView?.setContentView(sweetsInfoLayout)
-        popupView?.setDismissOnTouchOutside(true)
         popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
         return true
     }
