@@ -99,13 +99,20 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun onMarkerClick(marker: Marker): Boolean {
+        val googleMap = mMap?.let { it } ?: return false
+
+        val position = marker.position
+        val screenLocation = googleMap.projection.toScreenLocation(position)
+        val x = screenLocation.x
+        val y = screenLocation.y
+
         val sweetsInfoLayout = SweetsInfoLayout(this)
         sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
         popupView?.setMaxHeight(800)
         popupView?.setContentView(sweetsInfoLayout)
         popupView?.setDismissOnTouchOutside(true)
-        popupView?.show(Rect(100, 100, 100, 100), PopupView.AnchorGravity.AUTO, 300, 0)
+        popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
         return true
     }
 }
