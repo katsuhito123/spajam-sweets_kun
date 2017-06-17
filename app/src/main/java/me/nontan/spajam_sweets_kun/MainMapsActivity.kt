@@ -1,10 +1,13 @@
 package me.nontan.spajam_sweets_kun
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.view.View
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -14,19 +17,26 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import me.nontan.spajam_sweets_kun.models.SweetsKun
+import me.nontan.spajam_sweets_kun.models.Bounds
+import me.nontan.spajam_sweets_kun.models.Review
+import me.nontan.spajam_sweets_kun.models.ReviewSearchResponse
+import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import me.nontan.spajam_sweets_kun.views.PopupView
 import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 import kotlin.concurrent.timer
 
 class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private val handler: Handler = Handler()
     private var mMap: GoogleMap? = null
-    private var sweetsKuns: Array<SweetsKun> = arrayOf()
-    private var sweetsKunMarker: HashMap<SweetsKun, Marker> = hashMapOf()
-    private var sweetsKunPosition: HashMap<SweetsKun, LatLng> = hashMapOf()
+    private var reviews: Array<Review> = arrayOf()
+    private var reviewMarker: HashMap<Review, Marker> = hashMapOf()
+    private var reviewPosition: HashMap<Review, LatLng> = hashMapOf()
     private var popupView: PopupView? = null
+    private var floatingActionButton: FloatingActionButton? = null
 
     private var userId: Int = 0
     private var token: String = ""
@@ -37,6 +47,10 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
         popupView = findViewById(R.id.popup_view) as PopupView
+        floatingActionButton = findViewById(R.id.map_floating_action_button) as FloatingActionButton
+        floatingActionButton?.setOnClickListener {
+            onClickFloatingActionButton()
+        }
 
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -69,6 +83,10 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
             this.onMarkerClick(marker)
         }
 
+        googleMap.setOnCameraIdleListener {
+            this.onCameraIdle()
+        }
+      
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
         googleMap.isIndoorEnabled = false
@@ -76,20 +94,18 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         googleMap.isBuildingsEnabled = false
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
 
-
-        sweetsKuns = arrayOf(SweetsKun(0, 0, 35.0, 135.0))
         onSweetsViewsUpdated()
     }
 
     fun onSweetsViewsUpdated() {
         val googleMap = mMap?.let { it } ?: return
-        for (sweetsKun in sweetsKuns) {
+        for (sweetsKun in reviews) {
             val pos = LatLng(sweetsKun.latitude, sweetsKun.longitude)
             val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
             val marker = googleMap.addMarker(markerOpt)
 
-            sweetsKunMarker[sweetsKun] = marker
-            sweetsKunPosition[sweetsKun] = pos
+            reviewMarker[sweetsKun] = marker
+            reviewPosition[sweetsKun] = pos
         }
 
         timer("randomWalkTimer", false, 0, 500, {
@@ -97,13 +113,22 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         })
     }
 
+    fun kokunoaruRandom(): Double {
+        var sum = 0.0
+        for (i in 1..5) {
+            sum += Math.random() * 0.001
+        }
+
+        return sum / 5
+    }
+
     fun randomWalkSweetsKun() {
         handler.post {
-            for (sweetsKun in sweetsKuns) {
-                val marker = sweetsKunMarker[sweetsKun].let { it } ?: continue
-                val currentPos = sweetsKunPosition[sweetsKun].let { it } ?: continue
-                val newLatitude = currentPos.latitude + Math.random() * 0.001
-                val newLongitude = currentPos.longitude + Math.random() * 0.001
+            for (sweetsKun in reviews) {
+                val marker = reviewMarker[sweetsKun].let { it } ?: continue
+                val currentPos = reviewPosition[sweetsKun].let { it } ?: continue
+                val newLatitude = currentPos.latitude + kokunoaruRandom()
+                val newLongitude = currentPos.longitude + kokunoaruRandom()
                 val newPos = LatLng(newLatitude, newLongitude)
 
                 marker.position = newPos
@@ -122,10 +147,88 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         val sweetsInfoLayout = SweetsInfoLayout(this)
         sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
-        popupView?.setMaxHeight(800)
+        popupView?.setMaxHeight(400)
         popupView?.setContentView(sweetsInfoLayout)
         popupView?.setDismissOnTouchOutside(true)
         popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
         return true
+    }
+
+    fun onClickFloatingActionButton() {
+        val bounds = getBounds()
+
+        val intent = Intent(this, ShopsListActivity::class.java)
+        intent.putExtra("lat_min", bounds.lat_min)
+        intent.putExtra("lat_max", bounds.lat_max)
+        intent.putExtra("long_min", bounds.long_min)
+        intent.putExtra("long_max", bounds.long_max)
+
+        startActivity(intent)
+    }
+
+    fun getBounds(): Bounds {
+        val googleMap = mMap?.let { it } ?: return Bounds(0.0, 0.0, 0.0, 0.0)
+        val bounds = googleMap.projection.visibleRegion.latLngBounds
+        val northeast = bounds.northeast
+        val southwest = bounds.southwest
+
+        val lat_max = northeast.latitude
+        val lat_min = southwest.latitude
+
+        val long_max = northeast.longitude
+        val long_min = southwest.longitude
+
+        return Bounds(lat_max, lat_min, long_max, long_min)
+    }
+
+    fun onCameraIdle() {
+        val bounds = getBounds()
+
+        val lat_min = bounds.lat_min
+        val lat_max = bounds.lat_max
+        val long_min = bounds.long_min
+        val long_max = bounds.long_max
+
+        val reviewSearchCall = sharedAPIInstance.reviewSearch(lat_min, lat_max, long_min, long_max)
+        reviewSearchCall.enqueue(object: Callback<ReviewSearchResponse> {
+            override fun onResponse(call: Call<ReviewSearchResponse>, response: Response<ReviewSearchResponse>) {
+                Log.d("reviewsearch", "Response: " + response.body().toString());
+                Log.d("reviewsearch", "Error: " + response.errorBody()?.string().toString())
+
+
+                response.body()?.review?.let { newReviews ->
+                    Log.d("reviewsearch", "num newReviews: " + newReviews.size)
+                    handler.post {
+                        val googleMap = mMap?.let { it } ?: return@post
+                        val oldReviews = reviews.clone()
+                        for (newReview in newReviews) {
+                            val findResult = oldReviews.find { it.review_id == newReview.review_id }
+                            if (findResult == null) { // newly appeared
+                                val pos = LatLng(newReview.latitude, newReview.longitude)
+                                val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
+                                val marker = googleMap.addMarker(markerOpt)
+
+                                reviewMarker[newReview] = marker
+                                reviewPosition[newReview] = pos
+                            }
+                        }
+
+                        for (oldReview in oldReviews) {
+                            val findResult = newReviews.find { it.review_id == oldReview.review_id }
+                            if (findResult == null) { // disappeared
+                                reviewMarker[oldReview]?.remove()
+                                reviewMarker.remove(oldReview)
+                                reviewPosition.remove(oldReview)
+                            }
+                        }
+                        reviews = newReviews.clone()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ReviewSearchResponse>?, t: Throwable?) {
+                Log.d("reviewsearch", t.toString())
+            }
+        })
     }
 }
