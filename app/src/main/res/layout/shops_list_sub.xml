@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         app:cardUseCompatPadding="true"
-        app:contentPadding="20dp">
+        app:contentPadding="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -19,8 +19,8 @@
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="68dp"
-                android:layout_height="72dp"
+                android:layout_width="65dp"
+                android:layout_height="56dp"
                 app:srcCompat="@drawable/cake" />
 
             <LinearLayout
@@ -37,13 +37,11 @@
 
                     <TextView
                         android:id="@+id/shopName"
-                        android:layout_width="212dp"
-                        android:layout_height="48dp"
+                        android:layout_width="191dp"
+                        android:layout_height="36dp"
                         android:gravity="center_vertical"
-                        android:paddingLeft="20dp"
                         android:text="name"
-                        android:textAlignment="viewStart"
-                        android:textSize="18sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -53,7 +51,8 @@
                         android:gravity="center_vertical"
                         android:paddingLeft="20dp"
                         android:text="500m"
-                        android:textAlignment="textEnd" />
+                        android:textAlignment="textEnd"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
@@ -64,7 +63,8 @@
                     android:gravity="center_vertical"
                     android:paddingLeft="20dp"
                     android:text="address"
-                    android:textAlignment="textEnd" />
+                    android:textAlignment="textEnd"
+                    android:textSize="12sp" />
             </LinearLayout>
 
         </LinearLayout>
