@@ -104,13 +104,22 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         })
     }
 
+    fun kokunoaruRandom(): Double {
+        var sum = 0.0
+        for (i in 1..5) {
+            sum += Math.random() * 0.001
+        }
+
+        return sum / 5
+    }
+
     fun randomWalkSweetsKun() {
         handler.post {
             for (sweetsKun in sweetsKuns) {
                 val marker = sweetsKunMarker[sweetsKun].let { it } ?: continue
                 val currentPos = sweetsKunPosition[sweetsKun].let { it } ?: continue
-                val newLatitude = currentPos.latitude + Math.random() * 0.001
-                val newLongitude = currentPos.longitude + Math.random() * 0.001
+                val newLatitude = currentPos.latitude + kokunoaruRandom()
+                val newLongitude = currentPos.longitude + kokunoaruRandom()
                 val newPos = LatLng(newLatitude, newLongitude)
 
                 marker.position = newPos
