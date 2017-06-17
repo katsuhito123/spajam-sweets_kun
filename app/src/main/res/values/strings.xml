@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">spajam-sweets_kun</string>
     <string name="spn_pronpt">スイーツを選択をしてください</string>
     <string-array name="spn_items">
         <item>ケーキ</item>
@@ -8,4 +7,12 @@
         <item>かき氷</item>
         <item>パフェ</item>
     </string-array>
+    <string name="app_name">スイーツくん</string>
+    <string name="login">ログイン</string>
+    <string name="user_id">ユーザID</string>
+    <string name="password">パスワード</string>
+    <string name="input_error_msg">IDとパスワードを入力してください</string>
+    <string name="login_error_msg">メールアドレスかパスワードが間違っています</string>
+    <string name="title_activity_hoge">HogeActivity</string>
+>>>>>>> c9574be17e75b6f08d704137662d57b3fe09eb1a
 </resources>
