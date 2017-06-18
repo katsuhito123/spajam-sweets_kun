@@ -39,9 +39,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private lateinit var popupView: PopupView
     private lateinit var floatingActionButton: FloatingActionButton
 
-    private var userId: Int = 0
-    private var token: String = ""
-
     private var iconBitmaps: Array<BitmapDescriptor> = arrayOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,12 +68,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-
-        val userId = intent.getIntExtra("user_id", 0)
-        val token = intent.getStringExtra("token") ?: throw Exception("No token")
-
-        this.userId = userId
-        this.token = token
     }
 
     /**
