@@ -27,6 +27,7 @@ import me.nontan.spajam_sweets_kun.models.ReviewSearchResponse
 import me.nontan.spajam_sweets_kun.utilities.iconNumberToResource
 import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import me.nontan.spajam_sweets_kun.utilities.shrinkIcon
+import me.nontan.spajam_sweets_kun.utilities.userId
 import me.nontan.spajam_sweets_kun.views.PopupView
 import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
 import retrofit2.Call
@@ -46,6 +47,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private lateinit var floatingActionButton: FloatingActionButton
 
     private var iconBitmaps: Array<BitmapDescriptor> = arrayOf()
+    private var selfIconBitmaps: Array<BitmapDescriptor> = arrayOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,12 +61,17 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         }
 
         val maxSize = 48
+        val largeMaxSize = 96
         for (i in 0..5) {
             val resourceId = iconNumberToResource(i)
             val rawBitmap = BitmapFactory.decodeResource(resources, resourceId)
             val resizedBitmap = shrinkIcon(rawBitmap, maxSize)
             val resizedBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(resizedBitmap)
             iconBitmaps = iconBitmaps.plusElement(resizedBitmapDescriptor)
+
+            val largeResizedBitmap = shrinkIcon(rawBitmap, largeMaxSize)
+            val largeResizedBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(largeResizedBitmap)
+            selfIconBitmaps = selfIconBitmaps.plusElement(largeResizedBitmapDescriptor)
         }
 
         val mapFragment = supportFragmentManager
@@ -240,7 +247,12 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                             val findResult = oldReviews.find { it.review_id == newReview.review_id }
                             if (findResult == null) { // newly appeared
                                 val pos = LatLng(newReview.latitude, newReview.longitude)
-                                val markerOpt = MarkerOptions().position(pos).icon(iconBitmaps[newReview.sweet_type])
+                                var iconBitmap = iconBitmaps[newReview.sweet_type]
+                                if (newReview.user_id == userId) {
+                                    iconBitmap = selfIconBitmaps[newReview.sweet_type]
+                                }
+
+                                val markerOpt = MarkerOptions().position(pos).icon(iconBitmap)
                                 val marker = googleMap.addMarker(markerOpt)
 
                                 reviewMarker[newReview] = marker
