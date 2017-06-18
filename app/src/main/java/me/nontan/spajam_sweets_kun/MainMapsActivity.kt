@@ -69,7 +69,8 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
             val resizedBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(resizedBitmap)
             iconBitmaps = iconBitmaps.plusElement(resizedBitmapDescriptor)
 
-            val largeResizedBitmap = shrinkIcon(rawBitmap, largeMaxSize)
+            val rawBitmap2 = BitmapFactory.decodeResource(resources, resourceId)
+            val largeResizedBitmap = shrinkIcon(rawBitmap2, largeMaxSize)
             val largeResizedBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(largeResizedBitmap)
             selfIconBitmaps = selfIconBitmaps.plusElement(largeResizedBitmapDescriptor)
         }
@@ -249,6 +250,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                                 val pos = LatLng(newReview.latitude, newReview.longitude)
                                 var iconBitmap = iconBitmaps[newReview.sweet_type]
                                 if (newReview.user_id == userId) {
+                                    println("match")
                                     iconBitmap = selfIconBitmaps[newReview.sweet_type]
                                 }
 
