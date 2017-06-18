@@ -1,13 +1,19 @@
 package me.nontan.spajam_sweets_kun
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Rect
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentActivity
+import android.support.v4.content.PermissionChecker
 import android.util.Log
 import android.view.View
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -90,14 +96,40 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
             this.onCameraIdle()
         }
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
         googleMap.isIndoorEnabled = false
         googleMap.isTrafficEnabled = false
         googleMap.isBuildingsEnabled = false
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 10)
+        } else {
+            moveToCurrentPos()
+        }
 
         onSweetsViewsUpdated()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1000) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                moveToCurrentPos();
+                return;
+            }
+        }
+    }
+
+    fun moveToCurrentPos() {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val location = locationManager.getLastKnownLocation("gps")
+        if (location == null) {
+            val shinjukuPos = LatLng(35.691638, 139.704616)
+            googleMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(shinjukuPos))
+        } else {
+            val currentPos = LatLng(location.latitude, location.longitude)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentPos))
+        }
     }
 
     fun onSweetsViewsUpdated() {
