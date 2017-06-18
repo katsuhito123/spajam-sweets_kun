@@ -9,7 +9,9 @@ import android.os.Handler
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.FragmentActivity
 import android.util.Log
+import android.view.Gravity
 import android.view.View
+import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -68,6 +70,10 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val ts = Toast.makeText(this, "スイーツたちがたくさん集まってるお店を探そう！", Toast.LENGTH_LONG)
+        ts.setGravity(Gravity.TOP, 0, 80)
+        ts.show()
     }
 
     override fun onResume() {
