@@ -36,6 +36,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private lateinit var googleMap: GoogleMap
     private var reviews: Array<Review> = arrayOf()
     private var reviewMarker: HashMap<Review, Marker> = hashMapOf()
+    private var markerReview: HashMap<Marker, Review> = hashMapOf()
     private var reviewPosition: HashMap<Review, LatLng> = hashMapOf()
     private lateinit var popupView: PopupView
     private lateinit var floatingActionButton: FloatingActionButton
@@ -159,6 +160,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
         val y = screenLocation.y
 
         val sweetsInfoLayout = SweetsInfoLayout(this)
+        markerReview[marker]?.let {
+            sweetsInfoLayout.showReview(it)
+        }
         sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
         popupView.setMaxHeight(600)
@@ -219,6 +223,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                                 val marker = googleMap.addMarker(markerOpt)
 
                                 reviewMarker[newReview] = marker
+                                markerReview[marker] = newReview
                                 reviewPosition[newReview] = pos
                             }
                         }
@@ -226,6 +231,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                         for (oldReview in oldReviews) {
                             val findResult = newReviews.find { it.review_id == oldReview.review_id }
                             if (findResult == null) { // disappeared
+                                reviewMarker[oldReview]?.let {
+                                    markerReview.remove(it)
+                                }
                                 reviewMarker[oldReview]?.remove()
                                 reviewMarker.remove(oldReview)
                                 reviewPosition.remove(oldReview)
