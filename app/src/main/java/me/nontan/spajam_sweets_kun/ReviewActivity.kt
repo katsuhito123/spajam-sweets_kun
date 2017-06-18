@@ -1,5 +1,6 @@
 package me.nontan.spajam_sweets_kun
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -40,6 +41,8 @@ class ReviewActivity : AppCompatActivity() {
         id = intent.getIntExtra("shop_id", 0)
         rate = 3;
 
+        val activity = this
+
         rateBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
             rate = rating.toInt()
         }
@@ -56,6 +59,10 @@ class ReviewActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<ReviewCreateResponse>, response: Response<ReviewCreateResponse>) {
                     Log.d("reviewcreate", "Response: " + response.body().toString());
                     Log.d("reviewcreate", "Error: " + response.errorBody()?.string().toString())
+
+                    val intent = Intent(activity, MainMapsActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 }
 
                 override fun onFailure(call: Call<ReviewCreateResponse>?, t: Throwable?) {

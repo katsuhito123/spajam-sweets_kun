@@ -13,6 +13,7 @@ import me.nontan.spajam_sweets_kun.models.AuthenticationResponse
 import me.nontan.spajam_sweets_kun.models.LoginRequest
 import me.nontan.spajam_sweets_kun.utilities.accessToken
 import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
+import me.nontan.spajam_sweets_kun.utilities.userId
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,11 +39,11 @@ class LoginActivity : AppCompatActivity() {
         val loginBtn = findViewById(R.id.login) as Button
         loginBtn.setOnClickListener {
 
-            val userId = userIdForm.let { it?.text.toString() }
+            val email = userIdForm.let { it?.text.toString() }
             val password = passwordForm.let { it?.text.toString() }
 
             try {
-                val token_call: Call<AuthenticationResponse> = sharedAPIInstance.login(LoginRequest(userId, password))
+                val token_call: Call<AuthenticationResponse> = sharedAPIInstance.login(LoginRequest(email, password))
                 val intent : Intent = Intent(this, MainMapsActivity::class.java)
                 token_call.enqueue(object: Callback<AuthenticationResponse> {
                     override fun onResponse(call: Call<AuthenticationResponse>, response: Response<AuthenticationResponse>) {
@@ -53,15 +54,17 @@ class LoginActivity : AppCompatActivity() {
                             intent.putExtra("user_id", authentication.user_id)
                             intent.putExtra("token", authentication.token)
 
+                            userId = authentication.user_id
                             accessToken = authentication.token
 
                             val preferences = getPreferences(Context.MODE_PRIVATE)
                             val editor = preferences.edit()
-                            editor.putString("EMAIL", userId)
+                            editor.putString("EMAIL", email)
                             editor.putString("PASSWORD", password)
                             editor.apply()
 
                             startActivity(intent)
+                            finish()
                         }
                     }
                     override fun onFailure(call: Call<AuthenticationResponse>?, t: Throwable?) {

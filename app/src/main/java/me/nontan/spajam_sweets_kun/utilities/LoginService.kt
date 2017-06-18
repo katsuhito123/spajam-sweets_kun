@@ -8,6 +8,9 @@ interface LoginService {
     @POST("login")
     fun login(@Body body: LoginRequest): Call<AuthenticationResponse>
 
+    @GET("shop/{id}")
+    fun shop(@Path("id") shop_id: Int): Call<ShopResponse>
+
     @GET("shop/search")
     fun shopSearch(
             @Query("lat_min") lat_min: Double,
@@ -24,5 +27,6 @@ interface LoginService {
 
     @POST("review/create")
     fun reviewCreate(@Header("Authorization") auth: String, @Body body: ReviewCreateRequest): Call<ReviewCreateResponse>
+
 }
 

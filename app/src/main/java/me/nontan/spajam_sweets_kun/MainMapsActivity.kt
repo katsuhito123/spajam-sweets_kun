@@ -1,13 +1,19 @@
 package me.nontan.spajam_sweets_kun
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Rect
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentActivity
+import android.support.v4.content.PermissionChecker
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -23,6 +29,7 @@ import me.nontan.spajam_sweets_kun.models.ReviewSearchResponse
 import me.nontan.spajam_sweets_kun.utilities.iconNumberToResource
 import me.nontan.spajam_sweets_kun.utilities.sharedAPIInstance
 import me.nontan.spajam_sweets_kun.utilities.shrinkIcon
+import me.nontan.spajam_sweets_kun.utilities.userId
 import me.nontan.spajam_sweets_kun.views.PopupView
 import me.nontan.spajam_sweets_kun.views.SweetsInfoLayout
 import retrofit2.Call
@@ -31,21 +38,18 @@ import retrofit2.Response
 import java.util.*
 import kotlin.concurrent.timer
 
-
-
 class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private val handler: Handler = Handler()
-    private var mMap: GoogleMap? = null
+    private lateinit var googleMap: GoogleMap
     private var reviews: Array<Review> = arrayOf()
     private var reviewMarker: HashMap<Review, Marker> = hashMapOf()
+    private var markerReview: HashMap<Marker, Review> = hashMapOf()
     private var reviewPosition: HashMap<Review, LatLng> = hashMapOf()
-    private var popupView: PopupView? = null
-    private var floatingActionButton: FloatingActionButton? = null
-
-    private var userId: Int = 0
-    private var token: String = ""
+    private lateinit var popupView: PopupView
+    private lateinit var floatingActionButton: FloatingActionButton
 
     private var iconBitmaps: Array<BitmapDescriptor> = arrayOf()
+    private var selfIconBitmaps: Array<BitmapDescriptor> = arrayOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,17 +58,23 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
         popupView = findViewById(R.id.popup_view) as PopupView
         floatingActionButton = findViewById(R.id.map_floating_action_button) as FloatingActionButton
-        floatingActionButton?.setOnClickListener {
+        floatingActionButton.setOnClickListener {
             onClickFloatingActionButton()
         }
 
         val maxSize = 48
+        val largeMaxSize = 96
         for (i in 0..5) {
             val resourceId = iconNumberToResource(i)
             val rawBitmap = BitmapFactory.decodeResource(resources, resourceId)
             val resizedBitmap = shrinkIcon(rawBitmap, maxSize)
             val resizedBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(resizedBitmap)
             iconBitmaps = iconBitmaps.plusElement(resizedBitmapDescriptor)
+
+            val rawBitmap2 = BitmapFactory.decodeResource(resources, resourceId)
+            val largeResizedBitmap = shrinkIcon(rawBitmap2, largeMaxSize)
+            val largeResizedBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(largeResizedBitmap)
+            selfIconBitmaps = selfIconBitmaps.plusElement(largeResizedBitmapDescriptor)
         }
 
         val mapFragment = supportFragmentManager
@@ -78,12 +88,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-
-        val userId = intent.getIntExtra("user_id", 0)
-        val token = intent.getStringExtra("token") ?: throw Exception("No token")
-
-        this.userId = userId
-        this.token = token
     }
 
     /**
@@ -96,7 +100,7 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        this.googleMap = googleMap
 
         googleMap.setOnMarkerClickListener { marker ->
             this.onMarkerClick(marker)
@@ -106,18 +110,43 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
             this.onCameraIdle()
         }
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
         googleMap.isIndoorEnabled = false
         googleMap.isTrafficEnabled = false
         googleMap.isBuildingsEnabled = false
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 10)
+        } else {
+            moveToCurrentPos()
+        }
 
         onSweetsViewsUpdated()
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1000) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                moveToCurrentPos();
+                return;
+            }
+        }
+    }
+
+    fun moveToCurrentPos() {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val location = locationManager.getLastKnownLocation("gps")
+        if (location == null) {
+            val shinjukuPos = LatLng(35.691638, 139.704616)
+            googleMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(shinjukuPos))
+        } else {
+            val currentPos = LatLng(location.latitude, location.longitude)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentPos))
+        }
+    }
+
     fun onSweetsViewsUpdated() {
-        val googleMap = mMap?.let { it } ?: return
         for (sweetsKun in reviews) {
             val pos = LatLng(sweetsKun.latitude, sweetsKun.longitude)
             val markerOpt = MarkerOptions().position(pos).icon(BitmapDescriptorFactory.fromResource(R.drawable.cake_kun))
@@ -143,6 +172,10 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
 
     fun randomWalkSweetsKun() {
         handler.post {
+            if (popupView.isShowing) {
+                return@post
+            }
+
             for (sweetsKun in reviews) {
                 val marker = reviewMarker[sweetsKun].let { it } ?: continue
                 val currentPos = reviewPosition[sweetsKun].let { it } ?: continue
@@ -156,20 +189,20 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun onMarkerClick(marker: Marker): Boolean {
-        val googleMap = mMap?.let { it } ?: return false
-
         val position = marker.position
         val screenLocation = googleMap.projection.toScreenLocation(position)
         val x = screenLocation.x
         val y = screenLocation.y
 
         val sweetsInfoLayout = SweetsInfoLayout(this)
+        markerReview[marker]?.let {
+            sweetsInfoLayout.showReview(it)
+        }
         sweetsInfoLayout.setBackgroundColor(Color.WHITE)
         sweetsInfoLayout.visibility = View.VISIBLE
-        popupView?.setMaxHeight(600)
-        popupView?.setContentView(sweetsInfoLayout)
-        popupView?.setDismissOnTouchOutside(true)
-        popupView?.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
+        popupView.setMaxHeight(600)
+        popupView.setContentView(sweetsInfoLayout)
+        popupView.show(Rect(x, y, x, y), PopupView.AnchorGravity.AUTO, 300, 0)
         return true
     }
 
@@ -186,7 +219,6 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     fun getBounds(): Bounds {
-        val googleMap = mMap?.let { it } ?: return Bounds(0.0, 0.0, 0.0, 0.0)
         val bounds = googleMap.projection.visibleRegion.latLngBounds
         val northeast = bounds.northeast
         val southwest = bounds.southwest
@@ -217,16 +249,22 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                 response.body()?.review?.let { newReviews ->
                     Log.d("reviewsearch", "num newReviews: " + newReviews.size)
                     handler.post {
-                        val googleMap = mMap?.let { it } ?: return@post
                         val oldReviews = reviews.clone()
                         for (newReview in newReviews) {
                             val findResult = oldReviews.find { it.review_id == newReview.review_id }
                             if (findResult == null) { // newly appeared
                                 val pos = LatLng(newReview.latitude, newReview.longitude)
-                                val markerOpt = MarkerOptions().position(pos).icon(iconBitmaps[newReview.sweet_type])
+                                var iconBitmap = iconBitmaps[newReview.sweet_type]
+                                if (newReview.user_id == userId) {
+                                    println("match")
+                                    iconBitmap = selfIconBitmaps[newReview.sweet_type]
+                                }
+
+                                val markerOpt = MarkerOptions().position(pos).icon(iconBitmap)
                                 val marker = googleMap.addMarker(markerOpt)
 
                                 reviewMarker[newReview] = marker
+                                markerReview[marker] = newReview
                                 reviewPosition[newReview] = pos
                             }
                         }
@@ -234,6 +272,9 @@ class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
                         for (oldReview in oldReviews) {
                             val findResult = newReviews.find { it.review_id == oldReview.review_id }
                             if (findResult == null) { // disappeared
+                                reviewMarker[oldReview]?.let {
+                                    markerReview.remove(it)
+                                }
                                 reviewMarker[oldReview]?.remove()
                                 reviewMarker.remove(oldReview)
                                 reviewPosition.remove(oldReview)
