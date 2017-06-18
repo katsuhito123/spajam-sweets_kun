@@ -7,13 +7,22 @@
     android:orientation="vertical"
     tools:context="me.nontan.spajam_sweets_kun.LoginActivity">
 
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="112dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        app:srcCompat="@drawable/logo" />
+
     <EditText
         android:id="@+id/user_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="40dp"
         android:layout_weight="0"
         android:ems="10"
         android:hint="@string/user_id"

@@ -8,7 +8,7 @@
         <item>かき氷</item>
         <item>パフェ</item>
     </string-array>
-    <string name="app_name">スイーツくん</string>
+    <string name="app_name">SWEET MAP</string>
     <string name="login">ログイン</string>
     <string name="user_id">ユーザID</string>
     <string name="password">パスワード</string>
