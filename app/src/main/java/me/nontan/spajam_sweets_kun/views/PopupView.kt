@@ -46,7 +46,7 @@ class PopupView : RelativeLayout {
         touchHandleView.visibility = View.GONE
         addView(touchHandleView)
         triangularView = View(context)
-        val trianglerViewSize = 10
+        val trianglerViewSize = 35
         triangularView.layoutParams = ViewGroup.LayoutParams(trianglerViewSize, trianglerViewSize)
         triangularView.rotation = 45f
         triangularView.setBackgroundColor(Color.WHITE)

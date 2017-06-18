@@ -29,8 +29,6 @@ import retrofit2.Response
 import java.util.*
 import kotlin.concurrent.timer
 
-
-
 class MainMapsActivity : FragmentActivity(), OnMapReadyCallback {
     private val handler: Handler = Handler()
     private lateinit var googleMap: GoogleMap
